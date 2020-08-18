@@ -6,6 +6,7 @@ import json
 import sys
 import gc
 import os
+import sys
 
 sys.path.append('../pysim')
 

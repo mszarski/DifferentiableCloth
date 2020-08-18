@@ -59,7 +59,7 @@ CXXFLAGS += -MMD -MP
 # Complete build flags.
 COMMON_FLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir)) \
 	     -DTORCH_API_INCLUDE_EXTENSION_H -D_GLIBCXX_USE_CXX11_ABI=0
-CXXFLAGS += -pthread -fPIC -fwrapv -std=c++11 $(COMMON_FLAGS) $(WARNINGS)
+CXXFLAGS += -pthread -fPIC -fwrapv -std=c++17 $(COMMON_FLAGS) $(WARNINGS)
 
 all: $(STATIC_LIB)
 	python setup.py install --force

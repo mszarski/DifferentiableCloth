@@ -3,6 +3,7 @@ import arcsim
 import gc
 import time
 import json
+import sys
 
 sys.path.append('../pysim')
 
