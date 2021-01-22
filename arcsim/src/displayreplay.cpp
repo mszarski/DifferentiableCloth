@@ -47,13 +47,9 @@ static void reload () {
     int fullframe = ::frame*::frameskip;
     sim.time = fullframe * sim.frame_time;
 
-    cout << stringf("%s/%04d_",inprefix.c_str(), fullframe) << endl;
-    cout << stringf("%s/%04d_rig",inprefix.c_str(), fullframe) << endl;
+    cout << stringf("%s/%04d",inprefix.c_str(), fullframe) << endl;
+    load_objs(sim.cloth_meshes, stringf("%s/%04d",inprefix.c_str(), fullframe));
 
-    load_objs(sim.cloth_meshes, stringf("%s/%04d_",inprefix.c_str(), fullframe));
-    load_objs(sim.obstacle_meshes, stringf("%s/%04d_rig",inprefix.c_str(), fullframe));
-
-    
     if (sim.cloth_meshes[0]->verts.empty()) {
         if (::frame == 0)
         {
@@ -66,8 +62,8 @@ static void reload () {
     //     ::frame = 0;
     //     reload();
     }
-    // for (int o = 0; o < sim.obstacles.size(); o++)
-    //     sim.obstacles[o].get_mesh(sim.time);
+    for (int o = 0; o < sim.obstacles.size(); o++)
+        sim.obstacles[o].get_mesh(sim.time);
 }
 
 static void idle () {
