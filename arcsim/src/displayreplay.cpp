@@ -33,6 +33,7 @@
 #include "opengl.hpp"
 #include <cstdio>
 #include <fstream>
+#include <string>
 using namespace std;
 
 #ifndef NO_OPENGL
@@ -40,22 +41,33 @@ using namespace std;
 static string inprefix, outprefix;
 static int frameskip;
 
-static bool running = false;
+static bool running = true;
 
 static void reload () {
     int fullframe = ::frame*::frameskip;
     sim.time = fullframe * sim.frame_time;
-    load_objs(sim.cloth_meshes, stringf("%s/%04d",inprefix.c_str(), fullframe));
+
+    cout << stringf("%s/%04d_",inprefix.c_str(), fullframe) << endl;
+    cout << stringf("%s/%04d_rig",inprefix.c_str(), fullframe) << endl;
+
+    load_objs(sim.cloth_meshes, stringf("%s/%04d_",inprefix.c_str(), fullframe));
+    load_objs(sim.obstacle_meshes, stringf("%s/%04d_rig",inprefix.c_str(), fullframe));
+
+    
     if (sim.cloth_meshes[0]->verts.empty()) {
         if (::frame == 0)
+        {
             exit(EXIT_FAILURE);
-        if (!outprefix.empty())
+        }
+        else
+        {
             exit(EXIT_SUCCESS);
-        ::frame = 0;
-        reload();
+        }
+    //     ::frame = 0;
+    //     reload();
     }
-    for (int o = 0; o < sim.obstacles.size(); o++)
-        sim.obstacles[o].get_mesh(sim.time);
+    // for (int o = 0; o < sim.obstacles.size(); o++)
+    //     sim.obstacles[o].get_mesh(sim.time);
 }
 
 static void idle () {
@@ -64,7 +76,8 @@ static void idle () {
     fps.tick();
     if (!outprefix.empty()) {
         char filename[256];
-        snprintf(filename, 256, "%s/%04d.png", outprefix.c_str(), ::frame);
+        snprintf(filename, 256, "%s/%04d.bmp", outprefix.c_str(), ::frame);
+        cout << filename << endl;
         save_screenshot(filename);
     }
     ::frame++;
@@ -100,7 +113,7 @@ static void special (int key, int x, int y) {
 }
 
 void display_replay (const vector<string> &args) {
-    if (args.size() < 1 || args.size() > 2) {
+    if (args.size() < 1) {
         cout << "Replays the results of a simulation." << endl;
         cout << "Arguments:" << endl;
         cout << "    <out-dir>: Directory containing simulation output files"
@@ -108,21 +121,32 @@ void display_replay (const vector<string> &args) {
         cout << "    <sshot-dir> (optional): Directory to save images" << endl;
         exit(EXIT_FAILURE);
     }
+    cout << "reply 1 " << endl;
     ::inprefix = args[0];
-    ::outprefix = args.size()>1 ? args[1] : "";
+    ::outprefix = ::inprefix; //args.size()>1 ? args[1] : "";
+    cout << "reply 2 " << endl;
     ::frameskip = 1;
     if (!::outprefix.empty())
         ensure_existing_directory(::outprefix);
+    cout << "reply 3 " << endl;
     char config_backup_name[256];
     snprintf(config_backup_name, 256, "%s/%s", inprefix.c_str(), "conf.json");
+    cout << "reply 4 " << endl;
     load_json(config_backup_name, sim);
+    cout << "reply 5 " << endl;
     prepare(sim);
+    cout << "reply 6 " << endl;
     reload();
+    cout << "reply 7 " << endl;
     GlutCallbacks cb;
     cb.idle = idle;
     cb.keyboard = keyboard;
     cb.special = special;
+    cout << args[1] << endl;
+    cout << stod(args[1]) << endl;
+    set_pane_view(2,0.0,stod(args[1]),0.0,0.0,0.25);
     run_glut(cb);
+    cout << "reply 8 " << endl;
 }
 
 #else
