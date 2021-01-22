@@ -208,7 +208,6 @@ void update_constraints (Simulation &sim) {
     for (int h = 0; h < sim.handles.size(); h++) {
         Node *node = ((NodeHandle*)sim.handles[h])->get_nodes()[0];
         node->x = node->x + node->v*sim.step_time;
-        node->xold = node->x;
     }
 }
 
