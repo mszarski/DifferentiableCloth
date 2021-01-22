@@ -39,7 +39,7 @@
 #include <vector>
 
 using namespace std;
-using namespace torch;
+using torch::Tensor;
 
 static vector<Mesh*> &meshes = sim.cloth_meshes;
 string obj2png_filename;
@@ -51,7 +51,7 @@ struct View {
     double lat, lon;
     double off0, off1;
     double scale;
-    View (): lat(0), lon(0), off0(0), off1(0), scale(0.5) {}
+    View (): lat(0), lon(0), off0(0), off1(0), scale(0.25) {}
 };
 
 enum Pane {MaterialPane, PlasticPane, WorldPane};
@@ -101,7 +101,7 @@ void color (const Tensor &x0) {
 
 Tensor origami_color (const Face *face) {
     Tensor H = trace(face->S_plastic)/1000;
-    return 0.9*stack({1 + H, 1 - abs(H)/2, 1 - H});
+    return 0.9*torch::stack({1 + H, 1 - abs(H)/2, 1 - H});
 }
 
 void draw_mesh_ms (const Mesh &mesh, bool set_color=false) {
@@ -208,8 +208,8 @@ void draw_mesh (const Mesh &mesh, bool set_color=false) {
             Tensor frt0 = torch::tensor({0.7,0.7,0.7},TNOPT) + (a*cos(hue) + b*sin(hue))*0.3,
                  bak0 = frt0*0.5 + torch::tensor({0.5,0.5,0.5}, TNOPT);
             double *frt = frt0.data<double>(), *bak = bak0.data<double>();
-            float front[4] = {static_cast<float>(frt[0]), static_cast<float>(frt[1]), static_cast<float>(frt[2]), 1},
-                  back[4] = {static_cast<float>(bak[0]), static_cast<float>(bak[1]), static_cast<float>(bak[2]), 1};
+            float front[4] = {frt[0], frt[1], frt[2], 1},
+                  back[4] = {bak[0], bak[1], bak[2], 1};
             glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, front);
             glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, back);
             // color(area_color(face));
@@ -295,16 +295,15 @@ void draw_node_accels () {
 }
 
 void directional_light (int i, const vector<double> &dir, const vector<double> &dif) {
-    float diffuse[4] = {static_cast<float>(dif[0]), static_cast<float>(dif[1]), static_cast<float>(dif[2]), 1};
-    float position[4] = {static_cast<float>(dir[0]), static_cast<float>(dir[1]), static_cast<float>(dir[2]), 0};
+    float diffuse[4] = {dif[0], dif[1], dif[2], 1};
+    float position[4] = {dir[0], dir[1], dir[2], 0};
     glEnable(GL_LIGHT0+i);
     glLightfv(GL_LIGHT0+i, GL_DIFFUSE, diffuse);
     glLightfv(GL_LIGHT0+i, GL_POSITION, position);
 }
 
 void ambient_light (double a) {
-float aa=a;
-    float ambient[4] = {aa, aa, aa, 1};
+    float ambient[4] = {a, a, a, 1};
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
 }
 
@@ -524,25 +523,31 @@ void run_glut (const GlutCallbacks &cb) {
     char argv0[] = "";
     char *argv = argv0;
     glutInit(&argc, &argv);
+    //cout << "???? 71\n";
     glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE|GLUT_DEPTH|GLUT_MULTISAMPLE);
     glutInitWindowSize(1280,720);
     int window = glutCreateWindow("ARCSim");
     glutDisplayFunc(nop);
+    //cout << "???? 72\n";
     glutReshapeFunc(reshape);
     glutIdleFunc(cb.idle);
     glutKeyboardFunc(cb.keyboard);
     glutSpecialFunc(cb.special);
+    //cout << "???? 72\n";
     double x[4] = {0, 1280/3, 1280*2/3, 1280.};
     void (*display[3]) () = {display_material, display_plastic, display_world};
     for (int i = 0; i < 3; i++) {
         subwindows[i] = glutCreateSubWindow(window, x[i],0, x[i+1],720);
         glutDisplayFunc(display[i]);
         glutKeyboardFunc(cb.keyboard);
+    //cout << "???? 73\n";
         glutSpecialFunc(cb.special);
         glutMouseFunc(mouse);
         glutMotionFunc(motion);
+    //cout << "???? 74\n";
     }
     ::pane_enabled[PlasticPane] = sim.enabled[Simulation::Plasticity];
+    //cout << "???? 75\n";
     glutMainLoop();
 }
 
@@ -551,6 +556,16 @@ void redisplay () {
         glutSetWindow(subwindows[i]);
         glutPostRedisplay();
     }
+}
+
+void set_pane_view(int pane, double lat, double lon, double off0, double off1, double scale) {
+    View &view = views[pane];
+    view.lon = lon;
+    view.lat = lat;
+    view.lat = clamp(view.lat, -90., 90.);
+    view.off0 = off0;
+    view.off1 = off1;
+    view.scale = scale;
 }
 
 #endif // NO_OPENGL
