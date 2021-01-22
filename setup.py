@@ -9,10 +9,7 @@ setup(
     ext_modules=[
         CppExtension(
             name='arcsim',
-            include_dirs=[
-                '/home/roy/GitHub/forks/DifferentiableCloth/arcsim/src',
-                '/home/roy/GitHub/forks/DifferentiableCloth/arcsim/dependencies/include',
-                '/home/roy/GitHub/forks/DifferentiableCloth/arcsim/dependencies/include/alglib'],
+            include_dirs=['./arcsim/src/','./arcsim/dependencies/include'],
             sources=[
                 'pybind/bind.cpp',
             ],
