@@ -117,7 +117,12 @@ MeshGrad IneqCon::friction (Tensor dt, MeshHess &jac) {
     }
     Tensor T = torch::eye(3,TNOPT) - ger(n,n);
     Tensor vt = norm(matmul(T,v));
-    Tensor f_by_v = min(mu*fn/vt, 1/(dt*inv_mass));
+    //Tensor f_by_v = min(mu*fn/vt, 1/(dt*inv_mass));
+
+    Tensor f_by_v = min(mu*fn/vt, mu/(dt*inv_mass));
+
+    cout << "f_by_v = " << f_by_v << " mu*fn/vt= " << mu*fn/vt << " 1/(dt*inv_mass) = " << 1/(dt*inv_mass);
+
     // double f_by_v = mu*fn/max(vt, 1e-1);
     MeshGrad force;
     for (int i = 0; i < 4; i++) {
