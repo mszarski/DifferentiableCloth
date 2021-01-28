@@ -92,6 +92,8 @@ PYBIND11_MODULE(arcsim, m){
 	py::class_<Simulation>(m, "Simulation")
 		.def_readwrite("cloths",&Simulation::cloths, REF)
 		.def_readwrite("gravity",&Simulation::gravity, REF)
+		.def_readwrite("friction",&Simulation::friction, REF)
+		.def_readwrite("obs_friction",&Simulation::obs_friction, REF)
 		.def_readwrite("wind",&Simulation::wind, REF)
 		.def_readwrite("frame",&Simulation::frame, REF)
 		.def_readwrite("time",&Simulation::time, REF)
