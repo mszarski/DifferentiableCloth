@@ -460,7 +460,7 @@ void add_friction_forces (const Cloth &cloth, const vector<Constraint*> cons,
             if (!contains(mesh, node))
                 continue;
             b[node->index] = b[node->index] + dt*it->second;
-            cout << "friction force =" << it->second;
+            //cout << "friction force =" << it->second;
         }
         for (MeshHess::iterator it = jac.begin(); it != jac.end(); it++) {
             const Node *nodei = it->first.first, *nodej = it->first.second;
