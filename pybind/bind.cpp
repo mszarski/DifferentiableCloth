@@ -91,6 +91,7 @@ PYBIND11_MODULE(arcsim, m){
 	m.def("load_obj",&load_obj);
 	py::class_<Simulation>(m, "Simulation")
 		.def_readwrite("cloths",&Simulation::cloths, REF)
+    .def_readwrite("obstacles",&Simulation::obstacles, REF)
 		.def_readwrite("gravity",&Simulation::gravity, REF)
 		.def_readwrite("friction",&Simulation::friction, REF)
 		.def_readwrite("obs_friction",&Simulation::obs_friction, REF)
@@ -105,10 +106,15 @@ PYBIND11_MODULE(arcsim, m){
 		.def_readwrite("drag",&Wind::drag, REF)
 		;
 	py::bind_vector<std::vector<Cloth> >(m, "VCloth");
+  py::bind_vector<std::vector<Obstacle> >(m, "VObstacle");
 	py::class_<Cloth> cloth(m, "Cloth");
 	cloth
 		.def_readwrite("materials",&Cloth::materials, REF)
 		.def_readwrite("mesh",&Cloth::mesh, REF)
+		;
+  py::class_<Obstacle> obstacle(m, "Obstacle");
+	obstacle
+		.def_readwrite("curr_state_mesh",&Obstacle::curr_state_mesh, REF)
 		;
 	py::bind_vector<std::vector<Cloth::Material*> >(m, "VMatP");
 	py::class_<Cloth::Material>(cloth, "Material")
